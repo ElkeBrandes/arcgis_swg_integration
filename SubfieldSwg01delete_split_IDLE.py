@@ -1,3 +1,8 @@
+# this script is a work around due to errors in the feature class that I used for the first run of
+# spatial analysis to identify areas suitable for switchgrass.
+# There is also the option to try and repair the feature class before deleting features.
+# For the next feature class I will get from Gabe, I will try that first before considering the
+# script below.
 import sys
 print "Running script against: {}".format(sys.version)
 
@@ -13,7 +18,8 @@ arcpy.env.workspace = "E:\\switchgrass_integration.gdb"
 ###############################################################################################################################
 #
 #  # MultipartToSinglepart does not work: ExecuteError: ERROR 000072: Cannot process feature with OID 822481
-#  # This is a strange polygon that has an area, but Shape_Area is 0 in the attribute table. Since it is very small anyway,
+#  # This is a strange polygon that has an area, but Shape_Area is 0 in the attribute table. Since it is very
+#  # small anyway,
 #  # I delete it before I execute the splitting.
 #  # I also delete the 9 polygons with Shape_Area = 0.
 #  
@@ -35,7 +41,8 @@ with arcpy.da.UpdateCursor(in_feature,fields) as cursor:
 
 
 print("Splitting multipart features ...")
-# there are multipart polygons in the feature class that consist of one record (one cluid_mukey) but multiple polygons.
+# there are multipart polygons in the feature class that consist of one record (one cluid_mukey) but multiple
+# polygons.
 # Since we have to look at each polygon individually for its size and position in relation to others, we need to
 # split all multipart polygons into singlepart polygons.
 # The result is that there are duplicate records for some of the cluid_mukey records.
