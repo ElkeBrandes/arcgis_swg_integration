@@ -1,16 +1,19 @@
 # enter parameters:
-# sys.argv[1] the feature class that has been modified using the script "SubfieldSwg01reproject_join_IDLE" (e.g. "SubfieldIA_single")
+# sys.argv[1] the feature class that has been modified using the script
+#   "SubfieldSwg01reproject_join_IDLE" (e.g. "SubfieldIA_single")
 # sys.argv[2] corn yield cutoff, e.g. 8000 (kg/ha)
-# sys.argv[3] soybean yield cutoff, e.g. 2000 (kg/ha)
-# sys.argv[4] size cutoff, e.g. 5000 (m2) (meaning the size below a polygon is excluded from the area in switchgrass)
-# sys.argv[5] distance cutoff, e.g. 20 (m) (meaning the distance to a larger polygon that is tolerated to include a smaller polygon into the area)
+# sys.argv[3] soybean yield cutoff, e.g. 3000 (kg/ha)
+# sys.argv[4] size cutoff, e.g. 5000 (m2) (meaning the size below a
+#   polygon is excluded from the area in switchgrass)
+# sys.argv[5] distance cutoff, e.g. 20 (m) (meaning the distance to a
+#   larger polygon that is tolerated to include a smaller polygon into the area)
 print("Running script ...")
 
 import arcpy
 # set the environment so that output data are being overwritten
 arcpy.env.overwriteOutput=True
 # specify the workspace to avoid having to write the path for each feature class
-arcpy.env.workspace = "E:\\switchgrass_integration.gdb"
+arcpy.env.workspace = "C:\\Users\\ebrandes\\Documents\\DNDC\\switchgrass_integration.gdb"
 
 # check the spatial reference of the new feature class
 featureClass = sys.argv[1]
@@ -26,8 +29,15 @@ in_feature = featureClass
 out_layer = "SubfieldLowYield"
 corn_yield_cutoff = sys.argv[2]
 soy_yield_cutoff = sys.argv[3]
-where_clause = '"mean_corn_yield"' + " < " + str(int(corn_yield_cutoff) *0.001)
-field = "mean_corn_yield"
+where_clause = '(("crop11" = ' + " 'CG' AND " + '"yield11" < ' + str(
+                int(corn_yield_cutoff) *0.001) + ') OR ("crop11"' + " = 'SB' AND " + '"yield11" < ' + str(
+                int(soy_yield_cutoff) *0.001) + ')) AND (("crop12"' + " = 'CG' AND " + '"yield12" < ' + str(
+                int(corn_yield_cutoff) *0.001) + ') OR ("crop12"' + " = 'SB' AND " + '"yield12" < ' + str(
+                int(soy_yield_cutoff) *0.001) + ')) AND (("crop13"' + " = 'CG' AND " + '"yield13" < ' + str(
+                int(corn_yield_cutoff) *0.001)+ ') OR ("crop13"' + " = 'SB' AND " + '"yield13" < ' + str(
+                int(soy_yield_cutoff) *0.001) + ')) AND (("crop14"' + " = 'CG' AND " + '"yield14" < ' + str(
+                int(corn_yield_cutoff) *0.001)+ ') OR ("crop14"' + " = 'SB' AND " + '"yield14" < ' + str(
+                int(soy_yield_cutoff) *0.001) + "))"
 arcpy.MakeFeatureLayer_management(in_feature, out_layer, where_clause) # creates a temporary layer in the memory. Might cause crashes with large data sets.
 
 # dissolve polygons in feature layer, resulting in feature class 1
@@ -41,9 +51,8 @@ arcpy.Delete_management("SubfieldLowYield")
 # from featureClass1, select by attribute polygons < a cut off size (in square meters)
 in_feature = "featureClass1"
 out_layer = "SubfieldLowYieldSmall"
-#size_cutoff = int(arcpy.GetParameter(2))
-size_cutoff = arg3
-where_clause = '"Shape_Area"' + " < " + str(size_cutoff)
+size_cutoff = sys.argv[4]
+where_clause = '"Shape_Area" < ' + str(size_cutoff)
 arcpy.MakeFeatureLayer_management(in_feature, out_layer, where_clause)
 
 # create featureClass2 from feature layer (only the small polygons)
@@ -68,8 +77,7 @@ arcpy.MakeFeatureLayer_management("featureClass1", "SubfieldLowYieldLarge")
 in_layer = "SubfieldLowYieldSmall"
 overlap_type = 'WITHIN_A_DISTANCE'
 select_layer = "SubfieldLowYieldLarge"
-#distance_cutoff = arcpy.GetParameter(3)
-distance_cutoff = arg4
+distance_cutoff = sys.argv[5]
 search_distance = int(distance_cutoff)
 
 arcpy.SelectLayerByLocation_management(in_layer, overlap_type, select_layer, search_distance)
@@ -90,15 +98,16 @@ inputs = ["featureClass1", "featureClass3"]
 output = "featureClass4"
 arcpy.Merge_management(inputs, output)
 
-# add a field to featureClass
+# add an attribute field to featureClass
 in_feature = featureClass
-field_name = "in_swg" + "_" + str(yield_cutoff) + "_" + str(size_cutoff) + "_" + str(distance_cutoff) 
+field_name = "in_swg" + "_" + str(corn_yield_cutoff) + "_" + str(soy_yield_cutoff) + "_" + str(
+    size_cutoff) + "_" + str(distance_cutoff) 
 field_type = "TEXT"
 arcpy.AddField_management(in_feature, field_name, field_type)
-print("Added new field to " + str(arg1) + ": " + str(field_name) + ".")
+print("Added new field to " + str(sys.argv[1]) + ": " + str(field_name) + ".")
 
-# using update cursor to go through the rows of SubfieldIA027_Projected and check for two spatial attributes,
-# enter "TRUE" or "FALSE" into column "in_swgX"
+# using update cursor to go through the rows of SubfieldIA_single and check for two spatial attributes,
+# enter "TRUE" into column "in_swgX" if feature should be in switchgrass
 print("Going through features looking for those that fit into the scenario...")
 # make feature layer from featureClass
 in_feature = featureClass
@@ -115,17 +124,17 @@ with arcpy.da.UpdateCursor(out_layer, (field_name,)) as cursor:
         row[0] = "TRUE"  #adds "TRUE" to all the selected features
         cursor.updateRow(row)
         count += 1       # counts all selecetd features
-print("Done. Counted "  + str(count) + " features in " + str(arg1) +" that fall into the category.")
+print("Done. Counted "  + str(count) + " features in " + str(sys.argv[1]) +" that fall into the category.")
 print("Deleting interim feature classes ...")
 
 # clean up in memory layer
 arcpy.Delete_management("allSubfield")
 
 # clean up interim feature classes
-arcpy.Delete_management("featureClass1")
-arcpy.Delete_management("featureClass2")
-arcpy.Delete_management("featureClass3")
-arcpy.Delete_management("featureClass4")
+#arcpy.Delete_management("featureClass1")
+#arcpy.Delete_management("featureClass2")
+#arcpy.Delete_management("featureClass3")
+#arcpy.Delete_management("featureClass4")
 
 print("Done. Yay!")
 
