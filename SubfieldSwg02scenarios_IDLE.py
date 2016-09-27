@@ -1,14 +1,10 @@
 # enter parameters:
-# (0) the feature class that has been modified using the script "SubfieldSwg01reproject_join" (e.g. "SubfieldIA027_single")
-# (1) yield cutoff, e.g. 8000 (kg/ha)
-# (2) size cutoff, e.g. 5000 (m2) (meaning the size below a polygon is excluded from the area in switchgrass)
-# (3) distance cutoff, e.g. 20 (m) (meaning the distance to a larger polygon that is tolerated to include a smaller polygon into the area)
+# sys.argv[1] the feature class that has been modified using the script "SubfieldSwg01reproject_join_IDLE" (e.g. "SubfieldIA_single")
+# sys.argv[2] corn yield cutoff, e.g. 8000 (kg/ha)
+# sys.argv[3] soybean yield cutoff, e.g. 2000 (kg/ha)
+# sys.argv[4] size cutoff, e.g. 5000 (m2) (meaning the size below a polygon is excluded from the area in switchgrass)
+# sys.argv[5] distance cutoff, e.g. 20 (m) (meaning the distance to a larger polygon that is tolerated to include a smaller polygon into the area)
 print("Running script ...")
-arg1 = "SubfieldIA_single"
-arg2 = 8000
-arg3 = 5000
-arg4 = 20
-
 
 import arcpy
 # set the environment so that output data are being overwritten
@@ -17,19 +13,20 @@ arcpy.env.overwriteOutput=True
 arcpy.env.workspace = "E:\\switchgrass_integration.gdb"
 
 # check the spatial reference of the new feature class
-#featureClass = arcpy.GetParameterAsText(0)
-featureClass = arg1
+featureClass = sys.argv[1]
 desc = arcpy.Describe(featureClass)
 spatialRef = desc.SpatialReference
 print("Just checking ... Reference System is " + str(spatialRef.Name) + ".") # not really needed, just for checking
 
-# select polygons with corn yield < a cut off yield (in Mg/ha)
+# select polygons with corn and soybean yields < a cut off yield (in Mg/ha)
+# we are looking at a cutoff that refers to each yield in each year, 2011-2014
+# not the mean yields!
 
 in_feature = featureClass
 out_layer = "SubfieldLowYield"
-#yield_cutoff = arcpy.GetParameter(1)
-yield_cutoff = arg2
-where_clause = '"mean_corn_yield"' + " < " + str(int(yield_cutoff) *0.001)
+corn_yield_cutoff = sys.argv[2]
+soy_yield_cutoff = sys.argv[3]
+where_clause = '"mean_corn_yield"' + " < " + str(int(corn_yield_cutoff) *0.001)
 field = "mean_corn_yield"
 arcpy.MakeFeatureLayer_management(in_feature, out_layer, where_clause) # creates a temporary layer in the memory. Might cause crashes with large data sets.
 

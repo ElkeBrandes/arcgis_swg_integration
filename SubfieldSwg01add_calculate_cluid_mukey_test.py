@@ -11,7 +11,7 @@ arcpy.env.workspace = "C:\\Users\\ebrandes\\Documents\\DNDC\\switchgrass_integra
 # set variables:
 in_dataset = arcpy.GetParameterAsText(0)
 field_name = "cluid_mukey"
-field_type = "LONG"
+field_type = "DOUBLE"
 
 # delete field
 arcpy.DeleteField_management(in_dataset, field_name)
@@ -22,4 +22,4 @@ arcpy.AddField_management(in_dataset, field_name, field_type)
 # calculate the field with the update cursor
 with arcpy.da.UpdateCursor(in_dataset, (field_name,)) as cursor:
     for row in cursor:
-        row[0] = str("cluid") + "mukey"
+        row[0] = float(str("cluid") + "mukey")
