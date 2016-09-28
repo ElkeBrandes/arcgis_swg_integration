@@ -1,3 +1,8 @@
+# arguments passed in the cmd script:
+# sys.argv[1] the feature class that was amended by a field for each scenario
+#   by running script SubfieldSwg02scenarios_IDLE.py (e.g. "SubfieldIA_single")
+
+
 import csv # for export into csv file
 import sys # for export into csv file
 import arcpy
@@ -6,7 +11,7 @@ import re # regular expression, to extract the cutoff values out of the scenario
 # set the environment so that output data are being overwritten
 arcpy.env.overwriteOutput=True
 # specify the workspace to avoid having to write the path for each feature class
-arcpy.env.workspace = "E:\\switchgrass_integration.gdb"
+arcpy.env.workspace = "C:\\Users\\ebrandes\\Documents\\DNDC\\switchgrass_integration.gdb"
 
 # read through the table and calculate the total area that would be in switchgrass under a certain scenario
 
@@ -17,18 +22,17 @@ arcpy.env.workspace = "E:\\switchgrass_integration.gdb"
 #    print field.name
 
 # Make a list of fields that start with "in_swg*"
-featureClass = "SubfieldIA007_single" # can be deleted if script 2 is run before
+featureClass = sus.argv[1]
 swgList = arcpy.ListFields(featureClass, "in_swg*")
-#test print
-#for field in swgList:
-#    print(field.name)
+for field in swgList:
+    print(field.name)
 
 # make a vector of the field names in the list
 swgVector = []
 for field in swgList:
     swgVector.append(field.name)
-#test print
-#print(swgVector)
+
+print(swgVector)
 
 
 # create variables
@@ -36,9 +40,10 @@ area_field = "Shape_Area"
 totalArea = 0
 
 # create a csv file to write the result into
-f = open("E:\\swg_econ\\swg_areas\\resultsIA007.csv", 'wb')
+f = open("C:\\Users\\ebrandes\\Documents\\swg_econ\\swg_areas\\swg_areas_results.csv", 'wb')
 writer = csv.writer(f)
-writer.writerow(('yield_cutoff', 'size_cutoff', 'distance_cutoff', 'swg_area', 'swg_area_percent'))
+writer.writerow(('corn_yield_cutoff', 'soy_yield_cutoff', 'size_cutoff',\
+                 'distance_cutoff', 'swg_area', 'swg_area_percent'))
 ######
 
 # calculate total area in corn/soybean first to be able to calculate percentages below
@@ -59,7 +64,7 @@ for field in swgVector:
     print("The total area under scenario " + str(field) + " is " + str(totalAreaHa) + " ha.")
     values = re.findall(r'\d+', field)
     totalAreaPercent = round((totalAreaHa *100/totalCornSoyHa),1)
-    writer.writerow((str(values[0]), str(values[1]), str(values[2]), str(totalAreaHa), str(totalAreaPercent)))
+    writer.writerow((str(values[0]), str(values[1]), str(values[2]), str(values[2]), str(totalAreaHa), str(totalAreaPercent)))
 f.close()
 
 #####################
