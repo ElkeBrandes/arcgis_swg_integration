@@ -10,6 +10,7 @@
 print("Running script ...")
 
 import arcpy
+import sys
 # set the environment so that output data are being overwritten
 arcpy.env.overwriteOutput=True
 # specify the workspace to avoid having to write the path for each feature class
@@ -66,7 +67,7 @@ field = "Shape_Area"
 
 with arcpy.da.UpdateCursor(in_feature,(field,)) as cursor:
     for row in cursor:
-        if row[0] < size_cutoff:
+        if row[0] < float(size_cutoff):
             cursor.deleteRow()
 
 # from featureClass2: select by location polygons within a defined distance (in meters) of a larger polygon
@@ -131,10 +132,10 @@ print("Deleting interim feature classes ...")
 arcpy.Delete_management("allSubfield")
 
 # clean up interim feature classes
-#arcpy.Delete_management("featureClass1")
-#arcpy.Delete_management("featureClass2")
-#arcpy.Delete_management("featureClass3")
-#arcpy.Delete_management("featureClass4")
+arcpy.Delete_management("featureClass1")
+arcpy.Delete_management("featureClass2")
+arcpy.Delete_management("featureClass3")
+arcpy.Delete_management("featureClass4")
 
 print("Done. Yay!")
 
