@@ -22,7 +22,7 @@ arcpy.env.workspace = "C:\\Users\\ebrandes\\Documents\\DNDC\\switchgrass_integra
 #    print field.name
 
 # Make a list of fields that start with "in_swg*"
-featureClass = sus.argv[1]
+featureClass = sys.argv[1]
 swgList = arcpy.ListFields(featureClass, "in_swg*")
 for field in swgList:
     print(field.name)
@@ -64,7 +64,7 @@ for field in swgVector:
     print("The total area under scenario " + str(field) + " is " + str(totalAreaHa) + " ha.")
     values = re.findall(r'\d+', field)
     totalAreaPercent = round((totalAreaHa *100/totalCornSoyHa),1)
-    writer.writerow((str(values[0]), str(values[1]), str(values[2]), str(values[2]), str(totalAreaHa), str(totalAreaPercent)))
+    writer.writerow((str(values[0]), str(values[1]), str(values[2]), str(values[3]), str(totalAreaHa), str(totalAreaPercent)))
 f.close()
 
 #####################
