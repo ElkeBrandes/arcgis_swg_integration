@@ -21,20 +21,20 @@ arcpy.env.workspace = "C:\\Users\\ebrandes\\Documents\\DNDC\\switchgrass_integra
 in_dataset = sys.argv[1]
 out_dataset = str(in_dataset) + "_Projected"
 out_coor_system = arcpy.SpatialReference('NAD 1983 UTM Zone 15N')
-##arcpy.Project_management(in_dataset, out_dataset, out_coor_system)
+arcpy.Project_management(in_dataset, out_dataset, out_coor_system)
 
 # check the spatial reference of the new feature class
 featureClass = out_dataset
 desc = arcpy.Describe(featureClass)
 spatialRef = desc.SpatialReference
-##print("Just checking ... spatial reference system is " + str(spatialRef.Name) +".")
-##print("Fields in feature class:")
+print("Just checking ... spatial reference system is " + str(spatialRef.Name) +".")
+print("Fields in feature class:")
 
 # read the fields in a feature class
 fieldList = arcpy.ListFields(featureClass)
 # loop through each field in the list and print the name
-##for field in fieldList:
-##    print field.name
+for field in fieldList:
+    print field.name
     
 print("Joining with corn yield data ...")
 
