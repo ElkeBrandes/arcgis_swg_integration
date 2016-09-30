@@ -1,4 +1,4 @@
-# enter parameters:
+# arguments passed with the cmd script:
 # sys.argv[1] the feature class that has been modified using the script
 #   "SubfieldSwg01reproject_join_IDLE" (e.g. "SubfieldIA_single")
 # sys.argv[2] corn yield cutoff, e.g. 8000 (kg/ha)
