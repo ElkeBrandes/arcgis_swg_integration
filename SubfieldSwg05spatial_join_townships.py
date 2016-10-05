@@ -10,23 +10,18 @@ arcpy.env.overwriteOutput=True
 arcpy.env.workspace = "C:\\Users\\ebrandes\\Documents\\DNDC\\switchgrass_integration.gdb"
 
 
+# make a feature layer from the feature classes "Test_SubfieldIA181_Selection" and "Test_Townships"
+
+arcpy.MakeFeatureLayer_management("Test_SubfieldIA181_Selection", "test_subfield")
+arcpy.MakeFeatureLayer_management("Test_Townships", "test_twp")
+
+# select the features that cross township borders
+in_layer = "test_subfield"
+overlap_type = "CROSSED_BY_THE_OUTLINE_OF"
+select_features = "test_twp"
+arcpy.SelectLayerByLocation_management(in_layer, overlap_type, select_features)
+
+
 # spatial join
 
-target_features = "Townships_Projected"
-join_features = "SubfieldIA_single"
 
-SpatialJoin_analysis(target_features, join_features, out_feature_class, "JOIN_ONE_TO_MANY", \
-                     "KEEP_ALL", "
-
-
-
-
-in_dataset = "Townships"
-out_dataset = str(in_dataset) + "_Projected"
-out_coor_system = arcpy.SpatialReference('NAD 1983 UTM Zone 15N')
-arcpy.Project_management(in_dataset, out_dataset, out_coor_system)
-
-# check the spatial reference of the new feature class
-desc = arcpy.Describe(out_dataset)
-spatialRef = desc.SpatialReference
-print("Just checking ... Reference System is " + str(spatialRef.Name) + ".")
