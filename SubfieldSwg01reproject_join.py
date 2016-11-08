@@ -36,15 +36,15 @@ fieldList = arcpy.ListFields(featureClass)
 for field in fieldList:
     print field.name
     
-print("Joining with corn yield data ...")
+print("Joining with corn and soybean yield data ...")
 
 # join with corn yield data
 in_feature_class = featureClass
 in_field = "cluid_mukey" 
 join_table = sys.argv[2]
 join_field = "cluid_mukey11"
-field_list = ["crop11", "yield11", "crop12", "yield12", "crop13",
-              "yield13", "crop14", "yield14", "clumuha"]  # is "clumuha" needed?
+field_list = ["fips", "crop11", "yield11", "crop12", "yield12", "crop13",
+              "yield13", "crop14", "yield14"]  # is "clumuha" needed?
 
 arcpy.JoinField_management(in_feature_class, in_field, join_table, join_field, field_list)
 

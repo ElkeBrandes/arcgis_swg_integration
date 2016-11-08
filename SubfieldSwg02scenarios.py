@@ -1,12 +1,19 @@
 # arguments passed with the cmd script:
 # sys.argv[1] the feature class that has been modified using the script
-#   "SubfieldSwg01reproject_join_IDLE" (e.g. "SubfieldIA_single")
-# sys.argv[2] corn yield cutoff, e.g. 8000 (kg/ha)
-# sys.argv[3] soybean yield cutoff, e.g. 3000 (kg/ha)
+#   "SubfieldSwg01reproject_join" (e.g. "SubfieldIA_single")
+
+# sys.argv[2] corn yield cutoff: a field in the feature class that has been joined in the preceding script.
+#   E.g., "cut_cg_min_16" means the cut off for corn which is the minimum yield per county between 2000 and 2015.
+
+# sys.argv[3] soybean yield cutoff: a field in the feature class that has been joined in the preceding script.
+#   E.g., "cut_sb_min_16" means the cut off for soybean which is the minimum yield per county between 2000 and 2015.
+
 # sys.argv[4] size cutoff, e.g. 5000 (m2) (meaning the size below a
 #   polygon is excluded from the area in switchgrass)
+
 # sys.argv[5] distance cutoff, e.g. 20 (m) (meaning the distance to a
 #   larger polygon that is tolerated to include a smaller polygon into the area)
+
 print("Running script ...")
 
 import arcpy
@@ -22,27 +29,29 @@ desc = arcpy.Describe(featureClass)
 spatialRef = desc.SpatialReference
 print("Just checking ... Reference System is " + str(spatialRef.Name) + ".") # not really needed, just for checking
 
-# select polygons with corn and soybean yields < a cut off yield (in Mg/ha)
+# select polygons with corn and soybean yields < a county-specific cut off yield (in Mg/ha)
 # we are looking at a cutoff that refers to each yield in each year, 2011-2014
 # not the mean yields!
 
-in_feature = featureClass
-out_layer = "SubfieldLowYield"
-corn_yield_cutoff = sys.argv[2]
-soy_yield_cutoff = sys.argv[3]
-where_clause = '(("crop11" = ' + " 'CG' AND " + '"yield11" < ' + str(
-                int(corn_yield_cutoff) *0.001) + ') OR ("crop11"' + " = 'SB' AND " + '"yield11" < ' + str(
-                int(soy_yield_cutoff) *0.001) + ')) AND (("crop12"' + " = 'CG' AND " + '"yield12" < ' + str(
-                int(corn_yield_cutoff) *0.001) + ') OR ("crop12"' + " = 'SB' AND " + '"yield12" < ' + str(
-                int(soy_yield_cutoff) *0.001) + ')) AND (("crop13"' + " = 'CG' AND " + '"yield13" < ' + str(
-                int(corn_yield_cutoff) *0.001)+ ') OR ("crop13"' + " = 'SB' AND " + '"yield13" < ' + str(
-                int(soy_yield_cutoff) *0.001) + ')) AND (("crop14"' + " = 'CG' AND " + '"yield14" < ' + str(
-                int(corn_yield_cutoff) *0.001)+ ') OR ("crop14"' + " = 'SB' AND " + '"yield14" < ' + str(
-                int(soy_yield_cutoff) *0.001) + "))"
-arcpy.MakeFeatureLayer_management(in_feature, out_layer, where_clause) # creates a temporary layer in the memory. Might cause crashes with large data sets.
+# loop through the attribute table to select features that fall under the cut off values
+cg_cutoff_field = sys.argv[2]
+sb_cutoff_field = sys.argv[3]
+
+with arcpy.da.SearchCursor(featureClass, (cg_cutoff_field, sb_cutoff_field)) as cursor:
+    for row in cursor:
+        where_clause = '(("crop11" = ' + " 'CG' AND " + '"yield11" < ' + str(
+                int(cg_cutoff_field) *0.001) + ') OR ("crop11"' + " = 'SB' AND " + '"yield11" < ' + str(
+                int(sb_cutoff_field) *0.001) + ')) AND (("crop12"' + " = 'CG' AND " + '"yield12" < ' + str(
+                int(cg_cutoff_field) *0.001) + ') OR ("crop12"' + " = 'SB' AND " + '"yield12" < ' + str(
+                int(sb_cutoff_field) *0.001) + ')) AND (("crop13"' + " = 'CG' AND " + '"yield13" < ' + str(
+                int(cg_cutoff_field) *0.001)+ ') OR ("crop13"' + " = 'SB' AND " + '"yield13" < ' + str(
+                int(sb_cutoff_field) *0.001) + ')) AND (("crop14"' + " = 'CG' AND " + '"yield14" < ' + str(
+                int(cg_cutoff_field) *0.001)+ ') OR ("crop14"' + " = 'SB' AND " + '"yield14" < ' + str(
+                int(sb_cutoff_field) *0.001) + "))"
+        arcpy.selectLayerByAttribute_management(featureClass, "ADD_TO_SELECTION", where_clause)
 
 # dissolve polygons in feature layer, resulting in feature class 1
-in_feature = "SubfieldLowYield"
+in_feature = featureClass
 out_feature_class = "featureClass1"
 arcpy.Dissolve_management(in_feature, out_feature_class, "", "","SINGLE_PART", "DISSOLVE_LINES")
 
