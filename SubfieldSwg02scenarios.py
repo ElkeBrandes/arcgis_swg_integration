@@ -40,14 +40,14 @@ sb_cutoff_field = sys.argv[3]
 with arcpy.da.SearchCursor(featureClass, (cg_cutoff_field, sb_cutoff_field)) as cursor:
     for row in cursor:
         where_clause = '(("crop11" = ' + " 'CG' AND " + '"yield11" < ' + str(
-                int(cg_cutoff_field) *0.001) + ') OR ("crop11"' + " = 'SB' AND " + '"yield11" < ' + str(
-                int(sb_cutoff_field) *0.001) + ')) AND (("crop12"' + " = 'CG' AND " + '"yield12" < ' + str(
-                int(cg_cutoff_field) *0.001) + ') OR ("crop12"' + " = 'SB' AND " + '"yield12" < ' + str(
-                int(sb_cutoff_field) *0.001) + ')) AND (("crop13"' + " = 'CG' AND " + '"yield13" < ' + str(
-                int(cg_cutoff_field) *0.001)+ ') OR ("crop13"' + " = 'SB' AND " + '"yield13" < ' + str(
-                int(sb_cutoff_field) *0.001) + ')) AND (("crop14"' + " = 'CG' AND " + '"yield14" < ' + str(
-                int(cg_cutoff_field) *0.001)+ ') OR ("crop14"' + " = 'SB' AND " + '"yield14" < ' + str(
-                int(sb_cutoff_field) *0.001) + "))"
+                cg_cutoff_field *0.001) + ') OR ("crop11"' + " = 'SB' AND " + '"yield11" < ' + str(
+                sb_cutoff_field *0.001) + ')) AND (("crop12"' + " = 'CG' AND " + '"yield12" < ' + str(
+                cg_cutoff_field *0.001) + ') OR ("crop12"' + " = 'SB' AND " + '"yield12" < ' + str(
+                sb_cutoff_field *0.001) + ')) AND (("crop13"' + " = 'CG' AND " + '"yield13" < ' + str(
+                cg_cutoff_field *0.001)+ ') OR ("crop13"' + " = 'SB' AND " + '"yield13" < ' + str(
+                sb_cutoff_field *0.001) + ')) AND (("crop14"' + " = 'CG' AND " + '"yield14" < ' + str(
+                cg_cutoff_field *0.001)+ ') OR ("crop14"' + " = 'SB' AND " + '"yield14" < ' + str(
+                sb_cutoff_field *0.001) + "))"
         arcpy.selectLayerByAttribute_management(featureClass, "ADD_TO_SELECTION", where_clause)
 
 # dissolve polygons in feature layer, resulting in feature class 1
