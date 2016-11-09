@@ -18,10 +18,11 @@ print("Running script ...")
 
 import arcpy
 import sys
+from arcpy.sa import *  #spatial analyst extension
 # set the environment so that output data are being overwritten
 arcpy.env.overwriteOutput=True
 # specify the workspace to avoid having to write the path for each feature class
-arcpy.env.workspace = "C:\\Users\\ebrandes\\Documents\\DNDC\\switchgrass_integration.gdb"
+arcpy.env.workspace = r"C:\\Users\\ebrandes\\Documents\\DNDC\\switchgrass_integration.gdb"
 
 # check the spatial reference of the new feature class
 featureClass = sys.argv[1]
@@ -39,15 +40,15 @@ sb_cutoff_field = sys.argv[3]
 
 with arcpy.da.SearchCursor(featureClass, (cg_cutoff_field, sb_cutoff_field)) as cursor:
     for row in cursor:
-        where_clause = '(("crop11" = ' + " 'CG' AND " + '"yield11" < ' + str(
-                float(cg_cutoff_field) *0.001) + ') OR ("crop11"' + " = 'SB' AND " + '"yield11" < ' + str(
-                float(sb_cutoff_field) *0.001) + ')) AND (("crop12"' + " = 'CG' AND " + '"yield12" < ' + str(
-                float(cg_cutoff_field) *0.001) + ') OR ("crop12"' + " = 'SB' AND " + '"yield12" < ' + str(
-                float(sb_cutoff_field) *0.001) + ')) AND (("crop13"' + " = 'CG' AND " + '"yield13" < ' + str(
-                float(cg_cutoff_field) *0.001)+ ') OR ("crop13"' + " = 'SB' AND " + '"yield13" < ' + str(
-                float(sb_cutoff_field) *0.001) + ')) AND (("crop14"' + " = 'CG' AND " + '"yield14" < ' + str(
-                float(cg_cutoff_field) *0.001)+ ') OR ("crop14"' + " = 'SB' AND " + '"yield14" < ' + str(
-                float(sb_cutoff_field) *0.001) + "))"
+        where_clause = '(("crop12" = ' + " 'CG' AND " + '"yield12" < "' + \
+               cg_cutoff_field + '") OR ("crop12"' + " = 'SB' AND " + '"yield12" < "' + \
+               sb_cutoff_field + '")) AND (("crop13"' + " = 'CG' AND " + '"yield13" < "' + \
+                cg_cutoff_field + '") OR ("crop13"' + " = 'SB' AND " + '"yield13" < "' + \
+                sb_cutoff_field + '")) AND (("crop14"' + " = 'CG' AND " + '"yield14" < "' + \
+                cg_cutoff_field + '") OR ("crop14"' + " = 'SB' AND " + '"yield14" < "' + \
+                sb_cutoff_field + '")) AND (("crop15"' + " = 'CG' AND " + '"yield15" < "' + \
+                cg_cutoff_field + '") OR ("crop15"' + " = 'SB' AND " + '"yield15" < "' + \
+                sb_cutoff_field + '"))'
         arcpy.selectLayerByAttribute_management(featureClass, "ADD_TO_SELECTION", where_clause)
 
 # dissolve polygons in feature layer, resulting in feature class 1
