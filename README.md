@@ -15,11 +15,12 @@ SubfieldSwg01delete_split.py:
 Workaround script, see comments in script
 
 SubfieldSwg01reproject_join.py:
-This script includes steps to prepare the feature class and join yield data so that the yield-based scenarios can be run with the next script.
+This script includes steps to prepare the feature class and join yield data and yield cut-offs per county, so that the yield-based scenarios can be run with the next script.
 
 SubfieldSwg02scenarios.py:
 This script calculates for each subfield polygon if it falls into the category to be managed in switchgrass, each script run is one scenario with changing assumptions.
 For each scenario, a new field (column) is written in the attribute table.
+The scenarios include county-specific yield cut offs, based on historic corn and soybean yields.
 
 SubfieldSwg03test_areas.py:
 This script calculates the areas that would be managed in switchgrass for each scenario that is in the attribute table and exports it into a csv file.
