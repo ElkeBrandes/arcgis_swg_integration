@@ -31,16 +31,17 @@ spatialRef = desc.SpatialReference
 print("Just checking ... Reference System is " + str(spatialRef.Name) + ".") # not really needed, just for checking
 
 # select polygons with corn and soybean yields < a county-specific cut off yield (in Mg/ha)
-# we are looking at a cutoff that refers to each yield in each year, 2011-2014
+# we are looking at a cutoff that refers to each yield in each year, 2012-2015
 # not the mean yields!
+# each county has a different cut off based off of its harvest history.
 
-# loop through the attribute table to select features that fall under the cut off values
+print("Filtering for yield cut offs ...")
+# create a layer with select features that fall under the cut off values
+in_feature = featureClass
+out_layer = "SubfieldLowYield"
 cg_cutoff_field = sys.argv[2]
 sb_cutoff_field = sys.argv[3]
-
-with arcpy.da.SearchCursor(featureClass, (cg_cutoff_field, sb_cutoff_field)) as cursor:
-    for row in cursor:
-        where_clause = '(("crop12" = ' + " 'CG' AND " + '"yield12" < "' + \
+where_clause = '(("crop12" = ' + " 'CG' AND " + '"yield12" < "' + \
                cg_cutoff_field + '") OR ("crop12"' + " = 'SB' AND " + '"yield12" < "' + \
                sb_cutoff_field + '")) AND (("crop13"' + " = 'CG' AND " + '"yield13" < "' + \
                 cg_cutoff_field + '") OR ("crop13"' + " = 'SB' AND " + '"yield13" < "' + \
@@ -49,10 +50,11 @@ with arcpy.da.SearchCursor(featureClass, (cg_cutoff_field, sb_cutoff_field)) as 
                 sb_cutoff_field + '")) AND (("crop15"' + " = 'CG' AND " + '"yield15" < "' + \
                 cg_cutoff_field + '") OR ("crop15"' + " = 'SB' AND " + '"yield15" < "' + \
                 sb_cutoff_field + '"))'
-        arcpy.selectLayerByAttribute_management(featureClass, "ADD_TO_SELECTION", where_clause)
+arcpy.MakeFeatureLayer_management(in_feature, out_layer, where_clause)
+# creates a temporary layer in the memory. Might cause crashes with large data sets.
 
 # dissolve polygons in feature layer, resulting in feature class 1
-in_feature = featureClass
+in_feature = out_layer
 out_feature_class = "featureClass1"
 arcpy.Dissolve_management(in_feature, out_feature_class, "", "","SINGLE_PART", "DISSOLVE_LINES")
 
@@ -111,7 +113,7 @@ arcpy.Merge_management(inputs, output)
 
 # add an attribute field to featureClass
 in_feature = featureClass
-field_name = "in_swg" + "_" + str(corn_yield_cutoff) + "_" + str(soy_yield_cutoff) + "_" + str(
+field_name = "in_swg" + "_" + cg_cutoff_field[7:] + "_" + str(
     size_cutoff) + "_" + str(distance_cutoff) 
 field_type = "TEXT"
 arcpy.AddField_management(in_feature, field_name, field_type)
