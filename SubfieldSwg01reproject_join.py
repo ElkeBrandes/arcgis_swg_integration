@@ -5,7 +5,7 @@ print "Running script against: {}".format(sys.version)
 
 # the arguments noted below as sys.argv[1] and sys.argv[2] are passed in the cmd script "SubfieldSwg.cmd".
 # They refer to the two files, the Iowa subfield feature class and the txt file containing the
-# attributes (yield data)
+# attributes (yield and yield cut off data)
 
 import arcpy
 # set the environment so that output data are being overwritten
@@ -35,13 +35,21 @@ fieldList = arcpy.ListFields(featureClass)
 # loop through each field in the list and print the name
 for field in fieldList:
     print field.name
+
+print("Importing txt file into geodatabase ...")
+
+# yield and cut off data (table)
+in_rows ="C:\\Users\\ebrandes\\Documents\\swg_econ\\tables\\09_yields_cutoffs_2012_2015.txt"
+out_path = "C:\\Users\\ebrandes\\Documents\\DNDC\\switchgrass_integration.gdb"
+out_name = "yields_2012_2015_cuts"
+arcpy.TableToTable_conversion(in_rows, out_path, out_name)
     
 print("Joining with corn/soybean yield and yield threshold data ...")
 
 # join with corn yield data
 in_feature_class = featureClass
 in_field = "cluid_mukey" 
-join_table = sys.argv[2]
+join_table = out_name
 join_field = "cluid_mukey12"
 field_list = ["fips", "crop12", "yield12", "crop13",
               "yield13", "crop14", "yield14", "crop15", "yield15", "cut_cg_min_16",
