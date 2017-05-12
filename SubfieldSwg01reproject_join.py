@@ -1,11 +1,11 @@
-
+# This is the first script run in the county specific yield cut-off analysis to identify target areas for switchgrass conversion.
+# The 
 
 import sys
 print "Running script against: {}".format(sys.version)
 
-# the arguments noted below as sys.argv[1] and sys.argv[2] are passed in the cmd script "SubfieldSwg.cmd".
-# They refer to the two files, the Iowa subfield feature class and the txt file containing the
-# attributes (yield and yield cut off data)
+# The argument noted below as sys.argv[1] is passed in the cmd script "SubfieldSwg01.cmd".
+# It refers to the Iowa subfield feature class.
 
 import arcpy
 # set the environment so that output data are being overwritten
