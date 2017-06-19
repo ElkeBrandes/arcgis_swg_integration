@@ -1,6 +1,6 @@
 # arguments passed in the cmd script:
 # sys.argv[1] the feature class that was amended by a field for each scenario
-#   by running script SubfieldSwg02scenarios_IDLE.py (e.g. "SubfieldIA_single")
+#   by running script SubfieldSwg02scenarios.py (e.g. "SubfieldIA_single")
 
 
 import csv # for export into csv file
@@ -40,6 +40,7 @@ f = open("C:\\Users\\ebrandes\\Documents\\swg_econ\\swg_areas\\swg_areas_results
 writer = csv.writer(f)
 writer.writerow(('yield_scenario', 'yield_years' 'size_cutoff',\
                  'distance_cutoff', 'swg_area', 'swg_area_percent'))
+
 ######
 
 # calculate total area in corn/soybean first to be able to calculate percentages below
@@ -68,6 +69,17 @@ for field in swgVector:
 f.close()
 
 #####################
+
+# export attribute table as a txt file
+
+Input_Feature_Class = featureClass
+Value_Field = ["OBJECTID", "cluid_mukey", "fips", "Shape_Area", "in_swg_min_16_10000_20", "in_swg_2nd_16_10000_20",\
+               "in_swg_min_6_10000_20", "in_swg_2nd_6_10000_20"]
+Delimiter = "SPACE"
+Output_ASCII_File = "C:\\Users\\ebrandes\\Documents\\swg_econ\\tables\\swg_scenarios.txt"
+
+
+arcpy.ExportXYv_stats(Input_Feature_Class, Value_Field, Delimiter, Output_ASCII_File, "ADD_FIELD_NAMES")
 
 
 
