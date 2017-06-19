@@ -13,7 +13,7 @@ arcpy.env.overwriteOutput=True
 # specify the workspace to avoid having to write the path for each feature class
 arcpy.env.workspace = "C:\\Users\\ebrandes\\Documents\\DNDC\\switchgrass_integration.gdb"
 
-##print("Reprojecting feature class " + str(sys.argv[1]) + " ...")
+print("Reprojecting feature class " + str(sys.argv[1]) + " ...")
 
 # reproject the feature class to NAD 83 UTM Zone 15N
 # the feature class used here has already a field called

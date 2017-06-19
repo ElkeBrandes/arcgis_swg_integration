@@ -30,7 +30,7 @@ print("Exporting coordinates and attributes to text file ...")
 
 # variables:
 input_layer = out_layer
-value_field_list = ["OBJECTID", "cluid", "cluid_mukey", "crop12", "crop13", "crop14", "crop15", "Shape_Area"]
+value_field_list = ["OBJECTID", "cluid", "cluid_mukey", "fips", "crop12", "crop13", "crop14", "crop15", "Shape_Area"]
 delimiter = "SPACE"
 output_ASCII_file = "SubfieldIA_swg_2nd_16.txt"
 
